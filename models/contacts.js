@@ -1,16 +1,88 @@
-// const fs = require('fs/promises')
+import path from 'path'
+import fs from 'fs/promises'
+import { nanoid } from 'nanoid'
+import Joi from 'joi'
+const contactsPath = path.resolve("models", "contacts.json")
 
-const listContacts = async () => {}
+export const listContacts = async () => {
+ const data = await fs.readFile(contactsPath)
+ return JSON.parse(data)
+}
 
-const getContactById = async (contactId) => {}
+export const getContactById = async (id) => {
+  const contacts = await listContacts();
+  const result = contacts.find(item => item.id === id);
+  if (!result) {
+    return null
+  }
+  return result;
+}
 
-const removeContact = async (contactId) => {}
+export const removeContact = async (id) => {
+  const contacts = await listContacts();
+  const rew = contacts.find(item => item.id === id);
+  const result = contacts.filter(contact => contact.id !== id);
+  if (!rew) {
+    return null
+  }
+  await fs.writeFile(contactsPath, JSON.stringify(result))
+  return result;
+}
 
-const addContact = async (body) => {}
+export const addContact = async ({name,email, phone}) => {
+  const schema = Joi.object({
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().required(),
+  });
 
-const updateContact = async (contactId, body) => {}
+  const { error, value } = schema.validate({ name, email, phone });
 
-module.exports = {
+  if (error) {
+
+    throw new Error(error.details[0].message);
+  }
+  const contacts = await listContacts();
+    const newContact = {
+      id: nanoid(),
+      name,
+      email,
+      phone,
+    }
+    console.log(newContact)
+    contacts.push(newContact)
+    await fs.writeFile(contactsPath, JSON.stringify(contacts))
+    return newContact
+}
+
+export const updateContact = async (id, { name, email, phone }) => {
+  const contacts = await listContacts();
+
+  const schema = Joi.object({
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().required(),
+  });
+  const { error, value } = schema.validate({ name, email, phone });
+
+  if (error) {
+    throw new Error(error.details[0].message);
+  }
+
+  const contact = contacts.find((contact) => {
+    if (contact.id === id) {
+      contact.name = value.name;
+      contact.email = value.email;
+      contact.phone = value.phone;
+      console.log(`Contact with ID ${id} updated!`);
+      return contact;
+    }
+  });
+  
+  return contact;
+}
+
+export default {
   listContacts,
   getContactById,
   removeContact,
