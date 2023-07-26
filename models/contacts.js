@@ -29,7 +29,8 @@ export const removeContact = async (id) => {
   return result;
 }
 
-export const addContact = async ({name,email, phone}) => {
+export const addContact = async (body) => {
+  const {name,email, phone} = body
   const schema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
@@ -38,10 +39,6 @@ export const addContact = async ({name,email, phone}) => {
 
   const { error, value } = schema.validate({ name, email, phone });
 
-  if (error) {
-
-    throw new Error(error.details[0].message);
-  }
   const contacts = await listContacts();
     const newContact = {
       id: nanoid(),
@@ -55,19 +52,22 @@ export const addContact = async ({name,email, phone}) => {
     return newContact
 }
 
-export const updateContact = async (id, { name, email, phone }) => {
+export const updateContact = async (id, body) => {
   const contacts = await listContacts();
-
+  const rew = contacts.find(item => item.id === id);
+  if (!rew) {
+    return null
+  }
+  const  {name, email, phone } = body
+  if(!name || !email || !phone) {
+    return 400
+  }
   const schema = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().email().required(),
     phone: Joi.string().required(),
   });
   const { error, value } = schema.validate({ name, email, phone });
-
-  if (error) {
-    throw new Error(error.details[0].message);
-  }
 
   const contact = contacts.find((contact) => {
     if (contact.id === id) {
