@@ -54,8 +54,13 @@ export const update = async (req, res) => {
 		throw HttpError(400, 'missing fields')
 	    }
         const {error} = addShema.validate(req.body)
-        if(error) {
-            throw HttpError(400, `missing required ${error.details[0].path} field`)
+        if(error){
+            if(error.details[0].type === 'string.base') {
+                throw HttpError(400, error.message)
+            }
+            if(error.details[0].type ==='any.required') {
+                throw HttpError(400, `missing required ${error.details[0].path} field`)
+            }
         }
       const id = req.params.contactId
       const result = await contactsService.updateContact(id, req.body)
