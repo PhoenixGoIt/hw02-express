@@ -46,7 +46,7 @@ export const del = async (req, res) => {
       if(!result) {
         throw HttpError(404, `Not found`)
       }
-      res.status(201).json(res.json({"message": "contact deleted"}))
+      res.status(200).json(res.json({"message": "contact deleted"}))
     }
 export const update = async (req, res) => {
     const { name, email, phone } = req.body
