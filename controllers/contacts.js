@@ -33,22 +33,26 @@ export const del = async (req, res) => {
 
 export const updateById = async (req, res) => {
   const id = req.params.contactId
-  const { name, email, phone } = req.body
-	    if (!name && !email && !phone) {
-		throw HttpError(400, 'missing fields')
-	    }
   const result = await Contact.findByIdAndUpdate(id, req.body, {runValidators: true, new: true})
   if(!result) {
     throw HttpError(404, 'Not Found')
   }
   res.status(200).json(result)
 }
-
+export const patchById = async (req, res) => {
+  const id = req.params.contactId
+  const result = await Contact.findByIdAndUpdate(id, req.body, {runValidators: true, new: true})
+  if(!result) {
+    throw HttpError(404, 'Not Found')
+  }
+  res.status(200).json(result)
+}
 const ctrl = {
     getAll: ctrlWrapper(getAll),
     getById: ctrlWrapper(getById),
     add: ctrlWrapper(add), 
     del: ctrlWrapper(del),
     updateById: ctrlWrapper(updateById),  
+    patchById: ctrlWrapper(patchById), 
 };
 export default ctrl

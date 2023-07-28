@@ -17,5 +17,6 @@ const contactShema = new Schema(  {
   },
 }, {versionKey:false, timestamps:true})
 contactShema.post("save", handleSaveError)
+contactShema.post("findByIdAndUpdate", handleSaveError)
 const Contact = model("contact", contactShema)
 export default Contact;

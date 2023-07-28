@@ -13,4 +13,5 @@ router.delete('/:contactId',isValidId, ctrl.del)
 
 router.put('/:contactId',isValidId, ctrl.updateById)
 
+router.patch('/:contactId/favorite',isValidId, ctrl.patchById)
 export default router
