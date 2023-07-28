@@ -1,4 +1,5 @@
 import Contact from '../models/contacts.js'
+import { HttpError } from '../helpers/HttpError.js'
 import ctrlWrapper from '../helpers/ctrlWrapper.js'
 
 
@@ -15,18 +16,31 @@ export const add = async (req, res) => {
 export const getById = async (req, res) => {
     const id = req.params.contactId
     const result = await Contact.findById(id)
+    if(!result) {
+      throw HttpError(404, 'Not Found')
+    }
     res.status(200).json(result)
 }
 
 export const del = async (req, res) => {
   const id = req.params.contactId
-  const result = await Contact.findByIdAndDelete(id, {new: true, runValidators: true})
-  res.status(200).json(result)
+  const result = await Contact.findByIdAndDelete(id)
+  if(!result) {
+    throw HttpError(404, 'Not Found')
+  }
+  res.status(200).json({message:"contact deleted"})
 }
 
 export const updateById = async (req, res) => {
   const id = req.params.contactId
-  const result = await Contact.findByIdAndUpdate(id, req.body, {new: true, runValidators: true})
+  const { name, email, phone } = req.body
+	    if (!name && !email && !phone) {
+		throw HttpError(400, 'missing fields')
+	    }
+  const result = await Contact.findByIdAndUpdate(id, req.body, {runValidators: true, new: true})
+  if(!result) {
+    throw HttpError(404, 'Not Found')
+  }
   res.status(200).json(result)
 }
 
