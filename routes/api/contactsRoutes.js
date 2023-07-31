@@ -10,11 +10,11 @@ router.get('/',  ctrl.getAll)
 
 router.get('/:contactId', isValidId, ctrl.getById)
 
-router.post('/', isEmptyBody, validateBody(addContactShema), ctrl.add)
+router.post('/', isEmptyBody.isEmptyBody, validateBody(addContactShema), ctrl.add)
 
 router.delete('/:contactId',isValidId, ctrl.del)
 
-router.put('/:contactId',isEmptyBody, validateBody(addContactShema),isValidId, ctrl.updateById)
+router.put('/:contactId',isEmptyBody.isEmptyBody, validateBody(addContactShema),isValidId, ctrl.updateById)
 
-router.patch('/:contactId/favorite',isEmptyBody, validateBody(addUpdateFavotiteShema),isValidId, ctrl.patchById)
+router.patch('/:contactId/favorite',isEmptyBody.isEmptyFavoritBody, validateBody(addUpdateFavotiteShema),isValidId, ctrl.patchById)
 export default router
