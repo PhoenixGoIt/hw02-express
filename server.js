@@ -1,5 +1,15 @@
-const app = require('./app')
+import app from './app.js';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
-app.listen(3000, () => {
-  console.log("Server running. Use our API on port: 3000")
-})
+dotenv.config();
+
+const {DB_HOST, PORT} = process.env
+
+mongoose.connect(DB_HOST)
+.then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running. Use our API on port: ${PORT}`)
+  })
+}).catch((error) => console.log(error)).finally(console.log("Database connection successful"))
+
