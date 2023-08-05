@@ -4,17 +4,20 @@ import isValidId from '../../middlewares/isValidId.js'
 import validateBody from '../../decorators/validateBody.js'
 import { addContactShema, addUpdateFavotiteShema } from '../../shema/contacts-shema.js'
 import isEmptyBody from '../../middlewares/isEmptyBody.js'
-const router = express.Router()
+import authenticate from '../../middlewares/authenticate.js'
+const contactRouter = express.Router()
 
-router.get('/',  ctrl.getAll)
+contactRouter.use(authenticate)
 
-router.get('/:contactId', isValidId, ctrl.getById)
+contactRouter.get('/',  ctrl.getAll)
 
-router.post('/', isEmptyBody.isEmptyBody, validateBody(addContactShema), ctrl.add)
+contactRouter.get('/:contactId', isValidId, ctrl.getById)
 
-router.delete('/:contactId',isValidId, ctrl.del)
+contactRouter.post('/', isEmptyBody.isEmptyBody, validateBody(addContactShema), ctrl.add)
 
-router.put('/:contactId',isEmptyBody.isEmptyBody, validateBody(addContactShema),isValidId, ctrl.updateById)
+contactRouter.delete('/:contactId',isValidId, ctrl.del)
 
-router.patch('/:contactId/favorite',isEmptyBody.isEmptyFavoritBody, validateBody(addUpdateFavotiteShema),isValidId, ctrl.patchById)
-export default router
+contactRouter.put('/:contactId',isEmptyBody.isEmptyBody, validateBody(addContactShema),isValidId, ctrl.updateById)
+
+contactRouter.patch('/:contactId/favorite',isEmptyBody.isEmptyFavoritBody, validateBody(addUpdateFavotiteShema),isValidId, ctrl.patchById)
+export default contactRouter

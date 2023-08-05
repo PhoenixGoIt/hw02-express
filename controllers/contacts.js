@@ -1,19 +1,23 @@
-import Contact from '../models/contacts.js'
+import Contact from '../models/contact.js'
 import { HttpError } from '../helpers/HttpError.js'
 import ctrlWrapper from '../helpers/ctrlWrapper.js'
 
 
-export const getAll =  async (req, res) => {
-    const result = await Contact.find()
+ const getAll =  async (req, res) => {
+  const {_id: owner} = req.user
+  const {page = 1, limit = 10} = req.query
+  const skip = (page -1) * limit
+    const result = await Contact.find({owner}, "-createdAt -updatedAt", {skip, limit}).populate("owner", "name email")
     res.json(result)
 }
 
-export const add = async (req, res) => {
-   const result = await Contact.create(req.body)
+ const add = async (req, res) => {
+  const {_id: owner} = req.user
+   const result = await Contact.create({...req.body, owner})
    res.status(201).json(result)
 }
 
-export const getById = async (req, res) => {
+ const getById = async (req, res) => {
     const id = req.params.contactId
     const result = await Contact.findById(id)
     if(!result) {
@@ -22,7 +26,7 @@ export const getById = async (req, res) => {
     res.status(200).json(result)
 }
 
-export const del = async (req, res) => {
+ const del = async (req, res) => {
   const id = req.params.contactId
   const result = await Contact.findByIdAndDelete(id)
   if(!result) {
@@ -31,7 +35,7 @@ export const del = async (req, res) => {
   res.status(200).json({message:"contact deleted"})
 }
 
-export const updateById = async (req, res) => {
+ const updateById = async (req, res) => {
   const id = req.params.contactId
   const result = await Contact.findByIdAndUpdate(id, req.body, {runValidators: true, new: true})
   if(!result) {
@@ -39,7 +43,7 @@ export const updateById = async (req, res) => {
   }
   res.status(200).json(result)
 }
-export const patchById = async (req, res) => {
+ const patchById = async (req, res) => {
   const id = req.params.contactId
   const result = await Contact.findByIdAndUpdate(id, req.body, {runValidators: true, new: true})
   if(!result) {
@@ -47,12 +51,11 @@ export const patchById = async (req, res) => {
   }
   res.status(200).json(result)
 }
-const ctrl = {
-    getAll: ctrlWrapper(getAll),
-    getById: ctrlWrapper(getById),
-    add: ctrlWrapper(add), 
-    del: ctrlWrapper(del),
-    updateById: ctrlWrapper(updateById),  
-    patchById: ctrlWrapper(patchById), 
+export default {
+  getAll: ctrlWrapper(getAll),
+  getById: ctrlWrapper(getById),
+  add: ctrlWrapper(add), 
+  del: ctrlWrapper(del),
+  updateById: ctrlWrapper(updateById),  
+  patchById: ctrlWrapper(patchById), 
 };
-export default ctrl
