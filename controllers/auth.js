@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 import "dotenv/config"
 
 const {JWT_SECRET} = process.env
- const singin = async (req, res) => {
+ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if(!user) {
@@ -29,7 +29,7 @@ const {JWT_SECRET} = process.env
         }
     })
  }
- const signup = async (req, res) => {
+ const register = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 
@@ -65,8 +65,8 @@ const logout = async (req, res) => {
     res.status(204).json({})
 }
 export default {
-    signup: ctrlWrapper(signup),
-    singin: ctrlWrapper(singin),
+    register: ctrlWrapper(register),
+    login: ctrlWrapper(login),
     currentUser: ctrlWrapper(currentUser),
     logout: ctrlWrapper(logout),
 }
