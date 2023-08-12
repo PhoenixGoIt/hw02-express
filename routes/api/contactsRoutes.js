@@ -5,6 +5,7 @@ import validateBody from '../../decorators/validateBody.js'
 import { addContactShema, addUpdateFavotiteShema } from '../../shema/contacts-shema.js'
 import isEmptyBody from '../../middlewares/isEmptyBody.js'
 import authenticate from '../../middlewares/authenticate.js'
+import upload from '../../middlewares/upload.js'
 const contactRouter = express.Router()
 
 contactRouter.use(authenticate)
@@ -13,11 +14,12 @@ contactRouter.get('/',  ctrl.getAll)
 
 contactRouter.get('/:contactId', isValidId, ctrl.getById)
 
-contactRouter.post('/', isEmptyBody.isEmptyBody, validateBody(addContactShema), ctrl.add)
+contactRouter.post('/',isEmptyBody.isEmptyBody, validateBody(addContactShema), ctrl.add)
 
 contactRouter.delete('/:contactId',isValidId, ctrl.del)
 
 contactRouter.put('/:contactId',isEmptyBody.isEmptyBody, validateBody(addContactShema),isValidId, ctrl.updateById)
 
-contactRouter.patch('/:contactId/favorite',isEmptyBody.isEmptyFavoritBody, validateBody(addUpdateFavotiteShema),isValidId, ctrl.patchById)
+contactRouter.patch('/:contactId/favorite',isEmptyBody.isEmptyFavoritBody, validateBody(addUpdateFavotiteShema),isValidId, ctrl.updateById)
+
 export default contactRouter

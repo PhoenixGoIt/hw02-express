@@ -4,7 +4,10 @@ import bcrypt from "bcryptjs"
 import User from '../models/user.js'
 import jwt from 'jsonwebtoken'
 import "dotenv/config"
-
+import gravatar from "gravatar"
+import Jimp from 'jimp'
+import path from 'path'
+import fs from "fs/promises"
 const {JWT_SECRET} = process.env
  const login = async (req, res) => {
     const { email, password } = req.body;
@@ -19,13 +22,14 @@ const {JWT_SECRET} = process.env
     const payload ={
         id: user._id,
     }
-    const token = jwt.sign(payload,JWT_SECRET, {expiresIn: "23h"})
+    const token = jwt.sign(payload,JWT_SECRET)
     await User.findByIdAndUpdate(user._id, {token})
     res.json({
         token,
         user: {
             email: user.email,
-            subscription: user.subscription
+            subscription: user.subscription,
+            avatarURL: user.avatarURL,
         }
     })
  }
@@ -38,35 +42,60 @@ const {JWT_SECRET} = process.env
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const avatarURL = gravatar.url(email.trim().toLowerCase(), {s: '100', r: 'x', d: 'retro'}, true)
+    const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL: avatarURL });
 
     res.status(201).json({
         user: {
             email: newUser.email,
-            subscription: newUser.subscription
+            subscription: newUser.subscription,
+            avatarURL: avatarURL,
         }
     });
 };
 const currentUser = async (req, res) => {
-    const {email, subscription} = req.user
+    const {email, subscription, avatarURL} = req.user
     if(!email && subscription) {
         throw HttpError(401)
     }
     res.json({
         email: email,
         subscription: subscription,
+        avatarURL: avatarURL,
     })
 
 }
 const logout = async (req, res) => {
     const {_id} = req.user
-    console.log(_id)
     await User.findByIdAndUpdate(_id, {token: ""})
     res.status(204).json({})
 }
+const avatarPath = path.resolve("public", "avatars");
+
+const updateAvatar = async (req, res) => {
+        if(!req.file) {
+            throw HttpError(404, "missing field Avatar")
+        }
+        const { path: oldPath, filename } = req.file;
+        const newPath = path.join(avatarPath, filename);
+        await fs.rename(oldPath, newPath);
+
+        const avatarImage = await Jimp.read(newPath);
+        avatarImage.resize(250, 250);
+        await avatarImage.writeAsync(newPath);
+
+        const avatarUrl = path.join("public", "avatars", filename).replace(/\\/g, "/");
+
+        res.json({
+            avatarUrl,
+        });
+};
+
+
 export default {
     register: ctrlWrapper(register),
     login: ctrlWrapper(login),
     currentUser: ctrlWrapper(currentUser),
     logout: ctrlWrapper(logout),
+    updateAvatar: ctrlWrapper(updateAvatar),
 }
