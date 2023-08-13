@@ -11,6 +11,6 @@ authRouter.post('/register',isEmptyBody, validateBody(registerShema),  ctrl.regi
 authRouter.post('/login',isEmptyBody, validateBody(loginShema),  ctrl.login)
 authRouter.get('/current',authenticate,  ctrl.currentUser)
 authRouter.post('/logout',authenticate,  ctrl.logout)
-authRouter.patch('/avatar', upload.single("avatar") , authenticate,  ctrl.updateAvatar)
+authRouter.patch('/avatars', upload.single("avatar") , authenticate,  ctrl.updateAvatar)
 
 export default authRouter

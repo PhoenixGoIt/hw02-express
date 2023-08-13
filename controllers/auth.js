@@ -85,12 +85,10 @@ const updateAvatar = async (req, res) => {
         await avatarImage.writeAsync(newPath);
 
         const avatarUrl = path.join("public", "avatars", filename).replace(/\\/g, "/");
-
         res.json({
-            avatarUrl,
-        });
-};
-
+            avatarUrl: avatarUrl,
+        })
+    }
 
 export default {
     register: ctrlWrapper(register),
