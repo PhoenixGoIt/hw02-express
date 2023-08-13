@@ -76,6 +76,7 @@ const updateAvatar = async (req, res) => {
         if(!req.file) {
             throw HttpError(404, "missing field Avatar")
         }
+        const {_id} = req.user
         const { path: oldPath, filename } = req.file;
         const newPath = path.join(avatarPath, filename);
         await fs.rename(oldPath, newPath);
@@ -84,9 +85,11 @@ const updateAvatar = async (req, res) => {
         avatarImage.resize(250, 250);
         await avatarImage.writeAsync(newPath);
 
-        const avatarUrl = path.join("public", "avatars", filename).replace(/\\/g, "/");
+        const avatarURL = path.join("public", "avatars", filename).replace(/\\/g, "/");
+        console.log(avatarURL)
+        await User.findByIdAndUpdate(_id, {avatarURL}, {runValidators: true, new: true})
         res.json({
-            avatarUrl: avatarUrl,
+            avatarURL: avatarURL,
         })
     }
 
